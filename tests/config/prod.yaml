@@ -1,0 +1,13 @@
+# 生产环境配置
+api:
+  base_url: "http://prod.example.com"
+  timeout: 20
+browser:
+  type: "chromium"
+  headless: true
+performance:
+  users: 50
+  duration: 120
+logging:
+  level: "WARNING"
+  file: "reports/test.log"

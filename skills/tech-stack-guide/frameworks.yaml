@@ -1,0 +1,637 @@
+# =============================================================================
+# 技术选型指南 - 主流框架清单
+# =============================================================================
+# status 说明:
+#   preferred  - 首选推荐，团队主力技术栈
+#   accepted   - 可接受，适合特定场景
+#   excluded   - 排除，不允许在项目中使用
+#
+# 修改 status 字段即可控制 AI 自动编码时的选型范围
+# =============================================================================
+
+# ─────────────────────────────────────────────
+# JavaScript / TypeScript
+# ─────────────────────────────────────────────
+javascript:
+  web_frontend:
+    - name: React
+      version: "18.x / 19.x"
+      status: preferred
+      scene: "中大型 SPA、后台管理系统、跨平台(React Native)"
+      note: "生态最成熟，社区资源丰富"
+
+    - name: Vue
+      version: "3.x"
+      status: preferred
+      scene: "中小型项目、后台管理、快速原型"
+      note: "上手快，中文生态好，配合 Vite 开发体验优秀"
+
+    - name: Next.js
+      version: "14.x / 15.x"
+      status: preferred
+      scene: "SSR/SSG 站点、全栈 Web 应用"
+      note: "React 生态首选全栈框架，App Router 已稳定"
+
+    - name: Nuxt
+      version: "3.x"
+      status: accepted
+      scene: "Vue 生态 SSR/SSG 应用"
+      note: "Vue 全栈方案首选"
+
+    - name: Svelte / SvelteKit
+      version: "5.x"
+      status: accepted
+      scene: "轻量 Web 应用、注重性能的场景"
+      note: "编译时框架，bundle 体积小"
+
+    - name: Angular
+      version: "17.x / 18.x"
+      status: accepted
+      scene: "大型企业级应用、强类型要求高的团队"
+      note: "全家桶方案，学习曲线较陡"
+
+    - name: Astro
+      version: "4.x"
+      status: accepted
+      scene: "内容驱动型网站、文档站、博客"
+      note: "Islands 架构，默认零 JS"
+
+    - name: Solid.js
+      version: "1.x"
+      status: accepted
+      scene: "高性能 Web 应用"
+      note: "细粒度响应式，无虚拟 DOM"
+
+  web_backend:
+    - name: Express
+      version: "4.x / 5.x"
+      status: preferred
+      scene: "REST API、微服务、BFF 层"
+      note: "Node.js 最经典后端框架，中间件生态丰富"
+
+    - name: Nest.js
+      version: "10.x"
+      status: preferred
+      scene: "企业级后端、微服务架构"
+      note: "TypeScript 优先，装饰器风格，类 Spring 架构"
+
+    - name: Fastify
+      version: "4.x"
+      status: accepted
+      scene: "高性能 API 服务"
+      note: "比 Express 更快，schema 验证内置"
+
+    - name: Hono
+      version: "4.x"
+      status: accepted
+      scene: "Edge 运行时、Serverless、轻量 API"
+      note: "超轻量，支持多运行时(Cloudflare Workers/Deno/Bun)"
+
+    - name: Koa
+      version: "2.x"
+      status: accepted
+      scene: "轻量 API 服务"
+      note: "Express 团队出品，更现代的中间件模型"
+
+  desktop:
+    - name: Electron
+      version: "30.x+"
+      status: preferred
+      scene: "跨平台桌面应用"
+      note: "生态最成熟(VS Code/Slack 等)，内存占用较高"
+
+    - name: Tauri
+      version: "2.x"
+      status: preferred
+      scene: "轻量跨平台桌面应用"
+      note: "Rust 后端 + Web 前端，体积小性能好"
+
+    - name: Wails
+      version: "2.x"
+      status: accepted
+      scene: "Go + Web 前端桌面应用"
+      note: "类 Tauri 方案，Go 生态"
+
+  mobile:
+    - name: React Native
+      version: "0.74+"
+      status: preferred
+      scene: "跨平台移动应用"
+      note: "New Architecture 已稳定，配合 Expo 开发效率高"
+
+    - name: Expo
+      version: "51+"
+      status: preferred
+      scene: "React Native 项目的首选工具链"
+      note: "简化 RN 开发流程，EAS 构建服务"
+
+  css_ui:
+    - name: Tailwind CSS
+      version: "3.x / 4.x"
+      status: preferred
+      scene: "所有 Web 项目"
+      note: "原子化 CSS，开发效率高"
+
+    - name: Ant Design
+      version: "5.x"
+      status: preferred
+      scene: "React 后台管理系统"
+      note: "企业级组件库，中文文档完善"
+
+    - name: Element Plus
+      version: "2.x"
+      status: preferred
+      scene: "Vue 3 后台管理系统"
+      note: "Vue 生态最流行的组件库"
+
+    - name: shadcn/ui
+      version: "latest"
+      status: preferred
+      scene: "React 项目，需要高度自定义的 UI"
+      note: "非传统组件库，代码复制到项目中，完全可控"
+
+  build_tools:
+    - name: Vite
+      version: "5.x / 6.x"
+      status: preferred
+      scene: "前端项目构建"
+      note: "当前前端构建工具首选"
+
+    - name: Webpack
+      version: "5.x"
+      status: accepted
+      scene: "存量项目维护"
+      note: "功能全面但配置复杂，新项目建议用 Vite"
+
+    - name: Turbopack
+      version: "latest"
+      status: accepted
+      scene: "Next.js 项目"
+      note: "Vercel 出品，Next.js 内置支持"
+
+
+# ─────────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────────
+python:
+  web_backend:
+    - name: FastAPI
+      version: "0.110+"
+      status: preferred
+      scene: "REST/GraphQL API、微服务、AI 应用后端"
+      note: "异步优先，自动生成 OpenAPI 文档，类型提示驱动"
+
+    - name: Django
+      version: "5.x"
+      status: preferred
+      scene: "全栈 Web 应用、CMS、后台管理"
+      note: "全家桶方案，ORM/Admin/Auth 内置，适合快速交付"
+
+    - name: Flask
+      version: "3.x"
+      status: accepted
+      scene: "轻量 API、微服务、原型验证"
+      note: "灵活轻量，扩展丰富"
+
+    - name: Django REST Framework
+      version: "3.15+"
+      status: preferred
+      scene: "Django 项目的 REST API"
+      note: "Django 生态 API 开发标配"
+
+    - name: Sanic
+      version: "23.x"
+      status: accepted
+      scene: "高性能异步 API"
+      note: "类 Flask 语法，原生异步"
+
+  web_frontend:
+    - name: Streamlit
+      version: "1.x"
+      status: accepted
+      scene: "数据可视化、AI Demo、内部工具"
+      note: "纯 Python 写前端，适合数据团队"
+
+    - name: Gradio
+      version: "4.x"
+      status: accepted
+      scene: "AI/ML 模型 Demo 界面"
+      note: "快速搭建 AI 应用界面"
+
+  desktop:
+    - name: PyQt / PySide
+      version: "6.x"
+      status: preferred
+      scene: "跨平台桌面应用"
+      note: "Qt 绑定，功能全面，商业项目注意 License"
+
+    - name: Tkinter
+      version: "内置"
+      status: accepted
+      scene: "简单桌面工具"
+      note: "Python 内置，适合小工具"
+
+    - name: Flet
+      version: "0.x"
+      status: accepted
+      scene: "快速桌面/Web/移动应用"
+      note: "基于 Flutter，纯 Python 开发"
+
+  testing:
+    - name: pytest
+      version: "8.x"
+      status: preferred
+      scene: "所有 Python 测试"
+      note: "Python 测试框架事实标准"
+
+    - name: Locust
+      version: "2.x"
+      status: preferred
+      scene: "性能测试、负载测试"
+      note: "Python 编写测试脚本，分布式支持"
+
+    - name: Selenium
+      version: "4.x"
+      status: accepted
+      scene: "浏览器自动化测试"
+      note: "经典 UI 自动化方案"
+
+    - name: Playwright
+      version: "1.x"
+      status: preferred
+      scene: "浏览器自动化测试、E2E 测试"
+      note: "微软出品，比 Selenium 更现代，自动等待机制"
+
+# ─────────────────────────────────────────────
+# Java / Kotlin
+# ─────────────────────────────────────────────
+java:
+  web_backend:
+    - name: Spring Boot
+      version: "3.x"
+      status: preferred
+      scene: "企业级后端、微服务"
+      note: "Java 生态绝对主力，Spring 6 基于 Jakarta EE"
+
+    - name: Spring Cloud
+      version: "2023.x / 2024.x"
+      status: preferred
+      scene: "微服务架构、分布式系统"
+      note: "配合 Spring Boot，微服务全家桶"
+
+    - name: Quarkus
+      version: "3.x"
+      status: accepted
+      scene: "云原生 Java 应用、Serverless"
+      note: "启动快内存低，GraalVM 原生编译支持"
+
+    - name: Micronaut
+      version: "4.x"
+      status: accepted
+      scene: "微服务、Serverless"
+      note: "编译时 DI，启动快"
+
+    - name: Vert.x
+      version: "4.x"
+      status: accepted
+      scene: "高并发响应式应用"
+      note: "事件驱动，非阻塞"
+
+  web_frontend:
+    - name: Vaadin
+      version: "24.x"
+      status: accepted
+      scene: "Java 全栈 Web 应用"
+      note: "纯 Java 写前端，适合后端团队"
+
+    - name: Thymeleaf
+      version: "3.x"
+      status: accepted
+      scene: "Spring Boot 服务端渲染"
+      note: "Spring 官方推荐模板引擎"
+
+  desktop:
+    - name: JavaFX
+      version: "21+"
+      status: preferred
+      scene: "跨平台桌面应用"
+      note: "Java 桌面开发现代方案"
+
+    - name: Jetpack Compose Desktop
+      version: "1.x"
+      status: accepted
+      scene: "Kotlin 跨平台桌面应用"
+      note: "JetBrains 出品，声明式 UI"
+
+  mobile:
+    - name: Jetpack Compose
+      version: "1.x"
+      status: preferred
+      scene: "Android 原生开发"
+      note: "Google 官方推荐，声明式 UI"
+
+    - name: Kotlin Multiplatform
+      version: "1.9+"
+      status: accepted
+      scene: "Kotlin 跨平台(Android/iOS/Desktop/Web)"
+      note: "共享业务逻辑，原生 UI"
+
+
+# ─────────────────────────────────────────────
+# Go
+# ─────────────────────────────────────────────
+go:
+  web_backend:
+    - name: Gin
+      version: "1.x"
+      status: preferred
+      scene: "REST API、微服务"
+      note: "Go 最流行的 Web 框架，性能优秀"
+
+    - name: Echo
+      version: "4.x"
+      status: accepted
+      scene: "REST API、微服务"
+      note: "高性能，中间件丰富"
+
+    - name: Fiber
+      version: "2.x"
+      status: accepted
+      scene: "高性能 API"
+      note: "Express 风格 API，基于 fasthttp"
+
+    - name: Go Kit
+      version: "latest"
+      status: accepted
+      scene: "微服务工具集"
+      note: "微服务基础设施库，非全栈框架"
+
+    - name: Kratos
+      version: "2.x"
+      status: accepted
+      scene: "微服务框架"
+      note: "B站开源，gRPC + HTTP，适合国内团队"
+
+  desktop:
+    - name: Wails
+      version: "2.x"
+      status: preferred
+      scene: "Go + Web 前端桌面应用"
+      note: "Go 版 Tauri，轻量高效"
+
+    - name: Fyne
+      version: "2.x"
+      status: accepted
+      scene: "纯 Go 桌面应用"
+      note: "纯 Go 实现，无需 Web 技术"
+
+# ─────────────────────────────────────────────
+# Rust
+# ─────────────────────────────────────────────
+rust:
+  web_backend:
+    - name: Actix Web
+      version: "4.x"
+      status: preferred
+      scene: "高性能 API 服务"
+      note: "性能标杆，Actor 模型"
+
+    - name: Axum
+      version: "0.7+"
+      status: preferred
+      scene: "Web API、微服务"
+      note: "Tokio 团队出品，Tower 生态，类型安全"
+
+    - name: Rocket
+      version: "0.5+"
+      status: accepted
+      scene: "Web 应用"
+      note: "开发体验好，宏驱动"
+
+  desktop:
+    - name: Tauri
+      version: "2.x"
+      status: preferred
+      scene: "跨平台桌面应用"
+      note: "Rust 后端 + Web 前端，体积小"
+
+    - name: Dioxus
+      version: "0.5+"
+      status: accepted
+      scene: "Rust 全平台 UI(Web/Desktop/Mobile)"
+      note: "React 风格，纯 Rust"
+
+# ─────────────────────────────────────────────
+# C# / .NET
+# ─────────────────────────────────────────────
+dotnet:
+  web_backend:
+    - name: ASP.NET Core
+      version: "8.x / 9.x"
+      status: preferred
+      scene: "企业级 Web API、微服务"
+      note: ".NET 生态核心框架，性能优秀"
+
+    - name: Minimal APIs
+      version: ".NET 8+"
+      status: preferred
+      scene: "轻量 API、微服务"
+      note: "ASP.NET Core 内置，极简风格"
+
+  web_frontend:
+    - name: Blazor
+      version: ".NET 8+"
+      status: accepted
+      scene: "C# 全栈 Web 应用"
+      note: "Server/WASM/Hybrid 三种模式"
+
+  desktop:
+    - name: WPF
+      version: ".NET 8+"
+      status: preferred
+      scene: "Windows 桌面应用"
+      note: "Windows 桌面开发成熟方案"
+
+    - name: WinUI 3
+      version: "1.x"
+      status: accepted
+      scene: "现代 Windows 应用"
+      note: "Windows App SDK，Fluent Design"
+
+    - name: MAUI
+      version: ".NET 8+"
+      status: accepted
+      scene: "跨平台桌面/移动应用"
+      note: "微软官方跨平台方案，Xamarin 继任者"
+
+    - name: Avalonia
+      version: "11.x"
+      status: accepted
+      scene: "跨平台桌面应用(Windows/macOS/Linux)"
+      note: "真正跨平台的 .NET UI 框架"
+
+  mobile:
+    - name: MAUI
+      version: ".NET 8+"
+      status: accepted
+      scene: "跨平台移动应用"
+      note: "C# 跨平台移动开发"
+
+# ─────────────────────────────────────────────
+# Swift
+# ─────────────────────────────────────────────
+swift:
+  mobile:
+    - name: SwiftUI
+      version: "5.x"
+      status: preferred
+      scene: "iOS/macOS/watchOS/tvOS 原生开发"
+      note: "Apple 官方声明式 UI 框架"
+
+    - name: UIKit
+      version: "latest"
+      status: accepted
+      scene: "iOS 原生开发(存量项目)"
+      note: "命令式 UI，成熟稳定"
+
+  web_backend:
+    - name: Vapor
+      version: "4.x"
+      status: accepted
+      scene: "Swift 服务端开发"
+      note: "Swift 生态最成熟的后端框架"
+
+  desktop:
+    - name: SwiftUI (macOS)
+      version: "5.x"
+      status: preferred
+      scene: "macOS 原生应用"
+      note: "Apple 平台首选"
+
+# ─────────────────────────────────────────────
+# Dart
+# ─────────────────────────────────────────────
+dart:
+  mobile:
+    - name: Flutter
+      version: "3.x"
+      status: preferred
+      scene: "跨平台移动应用"
+      note: "Google 出品，一套代码多端运行，自绘引擎"
+
+  desktop:
+    - name: Flutter Desktop
+      version: "3.x"
+      status: accepted
+      scene: "跨平台桌面应用"
+      note: "Flutter 桌面端支持，稳定性持续提升"
+
+  web_frontend:
+    - name: Flutter Web
+      version: "3.x"
+      status: accepted
+      scene: "从移动端复用到 Web"
+      note: "适合已有 Flutter 移动端的项目"
+
+# ─────────────────────────────────────────────
+# PHP
+# ─────────────────────────────────────────────
+php:
+  web_backend:
+    - name: Laravel
+      version: "11.x"
+      status: preferred
+      scene: "全栈 Web 应用、API 后端"
+      note: "PHP 生态最流行框架，全家桶方案"
+
+    - name: Symfony
+      version: "7.x"
+      status: accepted
+      scene: "企业级 Web 应用"
+      note: "组件化设计，Laravel 底层也依赖 Symfony 组件"
+
+    - name: ThinkPHP
+      version: "8.x"
+      status: accepted
+      scene: "国内 PHP 项目"
+      note: "国内流行，中文文档完善"
+
+# ─────────────────────────────────────────────
+# Ruby
+# ─────────────────────────────────────────────
+ruby:
+  web_backend:
+    - name: Ruby on Rails
+      version: "7.x / 8.x"
+      status: preferred
+      scene: "全栈 Web 应用、快速原型"
+      note: "约定优于配置，开发效率极高"
+
+    - name: Sinatra
+      version: "4.x"
+      status: accepted
+      scene: "轻量 API、微服务"
+      note: "极简 Web 框架"
+
+# ─────────────────────────────────────────────
+# 跨语言通用工具
+# ─────────────────────────────────────────────
+cross_platform:
+  containerization:
+    - name: Docker
+      version: "latest"
+      status: preferred
+      scene: "容器化部署"
+
+    - name: Docker Compose
+      version: "v2"
+      status: preferred
+      scene: "本地多容器编排"
+
+  orchestration:
+    - name: Kubernetes
+      version: "1.29+"
+      status: preferred
+      scene: "容器编排、生产部署"
+
+  ci_cd:
+    - name: GitHub Actions
+      version: "latest"
+      status: preferred
+      scene: "CI/CD 流水线"
+
+    - name: GitLab CI
+      version: "latest"
+      status: accepted
+      scene: "CI/CD 流水线"
+
+    - name: Jenkins
+      version: "latest"
+      status: accepted
+      scene: "CI/CD(存量项目)"
+
+  database:
+    - name: PostgreSQL
+      version: "16+"
+      status: preferred
+      scene: "关系型数据库首选"
+
+    - name: MySQL
+      version: "8.x"
+      status: preferred
+      scene: "关系型数据库"
+
+    - name: Redis
+      version: "7.x"
+      status: preferred
+      scene: "缓存、消息队列、会话存储"
+
+    - name: MongoDB
+      version: "7.x"
+      status: accepted
+      scene: "文档型数据库"
+
+    - name: SQLite
+      version: "3.x"
+      status: preferred
+      scene: "嵌入式数据库、本地存储、开发测试"

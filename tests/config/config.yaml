@@ -1,0 +1,13 @@
+# 默认配置
+api:
+  base_url: "http://localhost:5000"
+  timeout: 10
+browser:
+  type: "chromium"
+  headless: true
+performance:
+  users: 10
+  duration: 30
+logging:
+  level: "DEBUG"
+  file: "reports/test.log"

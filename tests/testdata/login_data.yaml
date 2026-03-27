@@ -1,0 +1,58 @@
+# 登录接口测试数据
+# POST /api/login
+
+- name: "正常登录-admin"
+  input:
+    username: "admin"
+    password: "admin123"
+  expected:
+    status_code: 200
+    code: 200
+    msg: "登录成功"
+    has_token: true
+
+- name: "正常登录-user"
+  input:
+    username: "user"
+    password: "user123"
+  expected:
+    status_code: 200
+    code: 200
+    msg: "登录成功"
+    has_token: true
+
+- name: "错误密码"
+  input:
+    username: "admin"
+    password: "wrong"
+  expected:
+    status_code: 401
+    code: 401
+    msg: "用户名或密码错误"
+    has_token: false
+
+- name: "缺少用户名"
+  input:
+    password: "admin123"
+  expected:
+    status_code: 400
+    code: 400
+    msg: "请提供用户名和密码"
+    has_token: false
+
+- name: "缺少密码"
+  input:
+    username: "admin"
+  expected:
+    status_code: 400
+    code: 400
+    msg: "请提供用户名和密码"
+    has_token: false
+
+- name: "空请求体"
+  input: {}
+  expected:
+    status_code: 400
+    code: 400
+    msg: "请提供用户名和密码"
+    has_token: false

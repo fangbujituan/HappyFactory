@@ -1,0 +1,13 @@
+# 预发布环境配置
+api:
+  base_url: "http://staging.example.com"
+  timeout: 15
+browser:
+  type: "chromium"
+  headless: true
+performance:
+  users: 20
+  duration: 60
+logging:
+  level: "INFO"
+  file: "reports/test.log"

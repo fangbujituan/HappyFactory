@@ -1,0 +1,263 @@
+# =============================================================================
+# 测试规范本体 - 测试策略与规则清单
+# =============================================================================
+# level 说明:
+#   required   - 必须遵循
+#   preferred  - 推荐遵循
+#   optional   - 可选，视项目需求决定
+# =============================================================================
+
+# ─────────────────────────────────────────────
+# 测试分层
+# ─────────────────────────────────────────────
+test_layers:
+  principle: "测试金字塔：单元测试多、集成测试适中、E2E 测试少"
+  level: preferred
+
+  layers:
+    - name: "单元测试 (Unit Test)"
+      scope: "单个函数或类的方法"
+      level: required
+      rules:
+        - "不依赖外部服务（数据库、网络、文件系统）"
+        - "执行速度快（单个用例 < 100ms）"
+        - "使用 mock 隔离外部依赖"
+      marker: "@pytest.mark.unit"
+
+    - name: "集成测试 (Integration Test)"
+      scope: "多个组件协作、数据库交互、API 调用"
+      level: preferred
+      rules:
+        - "可以使用真实数据库（测试专用）"
+        - "可以调用真实的内部服务"
+        - "外部第三方服务仍然 mock"
+      marker: "@pytest.mark.integration"
+
+    - name: "端到端测试 (E2E Test)"
+      scope: "完整用户流程、UI 交互"
+      level: preferred
+      rules:
+        - "模拟真实用户操作"
+        - "数量控制在关键流程，不追求全覆盖"
+        - "支持 headless 模式在 CI 中运行"
+      markers:
+        - "@pytest.mark.ui"
+        - "@pytest.mark.e2e"
+
+# ─────────────────────────────────────────────
+# 命名规范
+# ─────────────────────────────────────────────
+naming:
+  test_files:
+    - rule: "测试文件命名：test_<被测模块名>.py"
+      level: required
+      examples:
+        good: ["test_user_service.py", "test_api_client.py", "test_config_manager.py"]
+        bad: ["user_service_test.py", "test1.py", "tests.py"]
+
+  test_functions:
+    - rule: "测试函数命名：test_<方法名>_<场景>"
+      level: required
+      examples:
+        good:
+          - "test_login_with_valid_credentials"
+          - "test_login_with_invalid_password"
+          - "test_get_user_when_not_found"
+          - "test_create_order_with_empty_cart"
+        bad:
+          - "test_login"
+          - "test_1"
+          - "test_it_works"
+
+  test_classes:
+    - rule: "测试类命名：Test<被测类名>"
+      level: preferred
+      examples:
+        good: ["TestUserService", "TestApiClient", "TestConfigManager"]
+
+# ─────────────────────────────────────────────
+# 覆盖率
+# ─────────────────────────────────────────────
+coverage:
+  rules:
+    - rule: "整体代码覆盖率不低于 80%"
+      level: preferred
+      note: "关注有意义的覆盖率，不为凑数字写无效测试"
+
+    - rule: "核心业务逻辑（Service 层）覆盖率不低于 90%"
+      level: preferred
+
+    - rule: "工具类和配置类覆盖率不低于 70%"
+      level: optional
+
+    - rule: "不追求 100% 覆盖率"
+      level: preferred
+      note: "getter/setter、简单委托方法不需要单独测试"
+
+# ─────────────────────────────────────────────
+# Mock 策略
+# ─────────────────────────────────────────────
+mocking:
+  rules:
+    - rule: "只 mock 你不拥有的东西"
+      level: preferred
+      should_mock:
+        - "外部 HTTP API 调用"
+        - "第三方服务（支付、短信、邮件）"
+        - "系统时间（time.time、datetime.now）"
+        - "随机数生成"
+        - "文件系统操作（在单元测试中）"
+      should_not_mock:
+        - "自己写的 Service 类（集成测试中用真实实例）"
+        - "简单的数据类和值对象"
+        - "纯函数工具方法"
+
+    - rule: "Mock 要验证交互，不只是替换返回值"
+      level: preferred
+      note: "使用 assert_called_with 验证参数，不只是 mock.return_value"
+
+    - rule: "优先使用 fixture 提供 mock 对象，避免在测试函数中重复创建"
+      level: preferred
+
+    - rule: "使用 pytest-mock 的 mocker fixture 而非 unittest.mock.patch 装饰器"
+      level: preferred
+      note: "mocker fixture 自动清理，不需要手动管理 patch 生命周期"
+
+# ─────────────────────────────────────────────
+# 测试数据管理
+# ─────────────────────────────────────────────
+test_data:
+  rules:
+    - rule: "测试数据与测试逻辑分离"
+      level: required
+      methods:
+        preferred: "YAML 文件（可读性好，支持复杂结构）"
+        accepted: ["JSON 文件", "CSV 文件（表格型数据）"]
+      directory: "tests/testdata/"
+
+    - rule: "使用 pytest fixture 管理测试前置数据"
+      level: required
+      rules:
+        - "公共 fixture 放在 conftest.py"
+        - "模块专用 fixture 放在对应的 fixtures/ 文件中"
+        - "fixture 按作用域合理设置 scope（session/module/function）"
+
+    - rule: "数据驱动测试使用 pytest.mark.parametrize"
+      level: required
+      example: |
+        @pytest.mark.parametrize("data", DataDriver.load("testdata/login_data.yaml"))
+        def test_login(api_client, data):
+            resp = api_client.post("/api/login", json=data["input"])
+            assert resp.status_code == data["expected"]["status_code"]
+
+    - rule: "测试数据中禁止使用真实的个人信息"
+      level: required
+      note: "使用虚构数据或 faker 库生成"
+
+# ─────────────────────────────────────────────
+# 测试结构
+# ─────────────────────────────────────────────
+test_structure:
+  pattern: "Arrange-Act-Assert (AAA)"
+  level: required
+  description: "每个测试函数分三段：准备数据 → 执行操作 → 验证结果"
+  example: |
+    def test_login_with_valid_credentials(flask_client):
+        # Arrange - 准备测试数据
+        credentials = {"username": "admin", "password": "admin123"}
+
+        # Act - 执行被测操作
+        response = flask_client.post("/api/login", json=credentials)
+
+        # Assert - 验证结果
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["code"] == 200
+        assert "token" in data["data"]
+
+  rules:
+    - rule: "每个测试函数只测一个行为"
+      level: required
+      note: "一个测试失败时应能立即定位问题"
+
+    - rule: "测试之间必须独立，不依赖执行顺序"
+      level: required
+
+    - rule: "测试不应修改共享状态"
+      level: required
+      note: "使用 fixture 的 function scope 确保每次测试环境干净"
+
+    - rule: "断言信息要有描述性"
+      level: preferred
+      examples:
+        bad: "assert result == 200"
+        good: "assert result == 200, f'期望状态码 200，实际返回 {result}'"
+
+# ─────────────────────────────────────────────
+# 测试标记（Markers）
+# ─────────────────────────────────────────────
+markers:
+  level: required
+  rules:
+    - rule: "所有测试必须标记类型"
+      level: required
+      available_markers:
+        - name: "api"
+          description: "API 接口测试"
+        - name: "ui"
+          description: "UI 自动化测试"
+        - name: "unit"
+          description: "单元测试"
+        - name: "integration"
+          description: "集成测试"
+        - name: "perf"
+          description: "性能测试"
+        - name: "security"
+          description: "安全测试"
+        - name: "smoke"
+          description: "冒烟测试（核心流程快速验证）"
+
+    - rule: "CI 中按 marker 分阶段执行"
+      level: preferred
+      order: "smoke → unit → api → integration → ui → security → perf"
+
+# ─────────────────────────────────────────────
+# 测试报告
+# ─────────────────────────────────────────────
+reporting:
+  rules:
+    - rule: "CI 中必须生成 JUnit XML 报告"
+      level: required
+      note: "供 CI 工具解析测试结果"
+
+    - rule: "生成 HTML 报告供人工查阅"
+      level: preferred
+      tools:
+        preferred: "pytest-html"
+        accepted: "allure"
+
+    - rule: "测试失败时自动收集上下文"
+      level: preferred
+      context:
+        - "API 测试：请求和响应详情"
+        - "UI 测试：页面截图"
+        - "所有测试：完整的错误堆栈"
+
+# ─────────────────────────────────────────────
+# 持续集成中的测试
+# ─────────────────────────────────────────────
+ci_testing:
+  rules:
+    - rule: "PR 合并前必须通过所有 unit 和 api 测试"
+      level: required
+
+    - rule: "UI 和性能测试可以在合并后的 nightly build 中执行"
+      level: preferred
+
+    - rule: "测试超时设置"
+      level: preferred
+      timeouts:
+        unit: "单个用例 < 5 秒"
+        api: "单个用例 < 10 秒"
+        ui: "单个用例 < 30 秒"
+        perf: "按配置文件定义"

@@ -1,0 +1,283 @@
+# =============================================================================
+# 安全基线本体 - 安全规则与最佳实践清单
+# =============================================================================
+# level 说明:
+#   required   - 必须遵循，安全红线不可违反
+#   preferred  - 推荐遵循，显著降低安全风险
+#   optional   - 可选，视项目安全等级决定
+# =============================================================================
+
+# ─────────────────────────────────────────────
+# 认证与授权
+# ─────────────────────────────────────────────
+authentication:
+  rules:
+    - rule: "密码必须使用单向哈希存储"
+      level: required
+      algorithms:
+        preferred: ["bcrypt", "argon2"]
+        accepted: ["scrypt", "PBKDF2"]
+        forbidden: ["MD5", "SHA1", "SHA256（不加盐）", "明文存储"]
+      note: "必须加盐（salt），盐值随机生成且每个用户独立"
+
+    - rule: "使用 JWT 或 Session 进行身份认证"
+      level: required
+      jwt_rules:
+        - "Token 必须设置过期时间，access_token 建议 15-60 分钟"
+        - "使用 RS256 或 HS256 签名，密钥长度不低于 256 位"
+        - "禁止在 JWT payload 中存放敏感信息（密码、身份证号等）"
+        - "refresh_token 过期时间建议 7-30 天，支持主动吊销"
+      session_rules:
+        - "Session ID 必须使用加密随机数生成"
+        - "Session 必须设置过期时间"
+        - "用户登出时必须销毁服务端 Session"
+
+    - rule: "实施最小权限原则"
+      level: required
+      rules:
+        - "每个 API 接口必须声明所需权限"
+        - "默认拒绝访问，显式授权才放行"
+        - "管理员接口与普通用户接口必须分离校验"
+
+    - rule: "登录安全防护"
+      level: preferred
+      rules:
+        - "登录失败达到阈值后锁定账户或增加延迟（如 5 次失败锁定 15 分钟）"
+        - "登录失败时不暴露具体原因（不区分'用户不存在'和'密码错误'）"
+        - "关键操作（修改密码、绑定手机）需要二次验证"
+
+# ─────────────────────────────────────────────
+# 输入验证与注入防护
+# ─────────────────────────────────────────────
+input_validation:
+  principle: "永远不信任用户输入"
+  level: required
+  rules:
+    - rule: "所有用户输入必须在服务端校验"
+      level: required
+      note: "前端校验仅用于用户体验，不可替代服务端校验"
+
+    - rule: "SQL 注入防护"
+      level: required
+      rules:
+        - "必须使用参数化查询或 ORM，禁止拼接 SQL 字符串"
+        - "禁止将用户输入直接嵌入 SQL 语句"
+      examples:
+        bad: "f\"SELECT * FROM users WHERE name = '{username}'\""
+        good: "cursor.execute('SELECT * FROM users WHERE name = %s', (username,))"
+
+    - rule: "XSS 防护"
+      level: required
+      rules:
+        - "所有输出到 HTML 的内容必须转义"
+        - "使用模板引擎的自动转义功能"
+        - "设置 Content-Type 响应头，避免浏览器 MIME 嗅探"
+        - "API 响应设置 Content-Type: application/json"
+
+    - rule: "命令注入防护"
+      level: required
+      rules:
+        - "避免使用 os.system()、subprocess.call(shell=True)"
+        - "必须使用参数列表形式调用外部命令"
+        - "禁止将用户输入拼接到系统命令中"
+      examples:
+        bad: "os.system(f'ping {user_input}')"
+        good: "subprocess.run(['ping', user_input], shell=False)"
+
+    - rule: "路径遍历防护"
+      level: required
+      rules:
+        - "禁止将用户输入直接用于文件路径"
+        - "使用白名单或 os.path.realpath() 验证路径合法性"
+        - "限制文件访问在指定目录范围内"
+
+    - rule: "输入长度和格式限制"
+      level: preferred
+      rules:
+        - "所有字符串输入设置最大长度"
+        - "使用正则或 Schema 校验输入格式"
+        - "文件上传限制类型和大小"
+
+# ─────────────────────────────────────────────
+# 数据保护
+# ─────────────────────────────────────────────
+data_protection:
+  rules:
+    - rule: "敏感数据分类管理"
+      level: required
+      categories:
+        high: "密码、密钥、Token、身份证号、银行卡号"
+        medium: "手机号、邮箱、地址"
+        low: "用户名、昵称"
+      note: "高敏感数据必须加密存储，中敏感数据脱敏展示"
+
+    - rule: "传输加密"
+      level: required
+      rules:
+        - "生产环境必须使用 HTTPS，禁止 HTTP 明文传输"
+        - "TLS 版本不低于 1.2，推荐 1.3"
+        - "内部服务间通信也应加密（mTLS 或 VPN）"
+
+    - rule: "存储加密"
+      level: preferred
+      rules:
+        - "数据库中的高敏感字段使用 AES-256 加密存储"
+        - "加密密钥与数据分离存储"
+        - "日志中禁止记录敏感数据原文"
+
+    - rule: "日志脱敏"
+      level: required
+      rules:
+        - "日志中禁止输出密码、Token、密钥等敏感信息"
+        - "手机号、邮箱等在日志中脱敏显示（如 138****1234）"
+        - "请求/响应日志需过滤敏感字段"
+
+    - rule: "数据备份与恢复"
+      level: preferred
+      rules:
+        - "定期备份数据库，备份文件加密存储"
+        - "定期验证备份可恢复性"
+
+# ─────────────────────────────────────────────
+# 密钥与凭证管理
+# ─────────────────────────────────────────────
+secrets_management:
+  rules:
+    - rule: "禁止在代码仓库中存储密钥和凭证"
+      level: required
+      rules:
+        - "API 密钥、数据库密码、JWT 密钥等通过环境变量或密钥管理服务注入"
+        - ".gitignore 必须包含 .env、*.pem、*.key 等敏感文件"
+        - "如果密钥意外提交到仓库，必须立即轮换（不能只删除 commit）"
+
+    - rule: "密钥轮换机制"
+      level: preferred
+      rules:
+        - "JWT 签名密钥定期轮换（建议 90 天）"
+        - "数据库密码定期更换"
+        - "第三方 API 密钥定期轮换"
+
+    - rule: "密钥强度要求"
+      level: required
+      rules:
+        - "对称加密密钥不低于 256 位"
+        - "RSA 密钥不低于 2048 位，推荐 4096 位"
+        - "随机数使用加密安全的随机数生成器（如 secrets 模块）"
+      examples:
+        bad: "import random; token = random.randint(0, 999999)"
+        good: "import secrets; token = secrets.token_urlsafe(32)"
+
+# ─────────────────────────────────────────────
+# HTTP 安全头
+# ─────────────────────────────────────────────
+http_security_headers:
+  level: preferred
+  headers:
+    - name: "X-Content-Type-Options"
+      value: "nosniff"
+      purpose: "防止 MIME 类型嗅探"
+
+    - name: "X-Frame-Options"
+      value: "DENY 或 SAMEORIGIN"
+      purpose: "防止点击劫持"
+
+    - name: "X-XSS-Protection"
+      value: "1; mode=block"
+      purpose: "启用浏览器 XSS 过滤"
+
+    - name: "Strict-Transport-Security"
+      value: "max-age=31536000; includeSubDomains"
+      purpose: "强制 HTTPS"
+
+    - name: "Content-Security-Policy"
+      value: "根据项目需求定制"
+      purpose: "限制资源加载来源，防止 XSS"
+
+    - name: "Referrer-Policy"
+      value: "strict-origin-when-cross-origin"
+      purpose: "控制 Referer 头泄露"
+
+# ─────────────────────────────────────────────
+# CORS 跨域安全
+# ─────────────────────────────────────────────
+cors:
+  level: required
+  rules:
+    - rule: "禁止使用 Access-Control-Allow-Origin: *（生产环境）"
+      level: required
+      note: "必须明确指定允许的域名列表"
+
+    - rule: "限制允许的 HTTP 方法"
+      level: preferred
+      note: "只开放实际需要的方法，不要全部放行"
+
+    - rule: "携带凭证的请求必须指定具体 Origin"
+      level: required
+      note: "Access-Control-Allow-Credentials: true 时不能用通配符"
+
+# ─────────────────────────────────────────────
+# 依赖安全
+# ─────────────────────────────────────────────
+dependency_security:
+  rules:
+    - rule: "定期扫描依赖漏洞"
+      level: preferred
+      tools:
+        python: ["pip-audit", "safety"]
+        javascript: ["npm audit", "snyk"]
+        java: ["OWASP Dependency-Check"]
+      frequency: "每次 CI 构建时自动扫描"
+
+    - rule: "锁定依赖版本"
+      level: required
+      rules:
+        - "使用 lock 文件锁定精确版本（requirements.txt 带版本号、package-lock.json）"
+        - "禁止在生产依赖中使用 >= 或 * 等宽泛版本范围"
+
+    - rule: "最小化依赖"
+      level: preferred
+      rules:
+        - "优先使用标准库功能"
+        - "引入新依赖前评估其维护状态和安全历史"
+        - "定期清理未使用的依赖"
+
+# ─────────────────────────────────────────────
+# 错误处理与信息泄露
+# ─────────────────────────────────────────────
+error_disclosure:
+  rules:
+    - rule: "生产环境禁止暴露技术细节"
+      level: required
+      rules:
+        - "错误响应不返回堆栈信息、SQL 语句、文件路径"
+        - "使用通用错误消息面向用户，详细错误记录到日志"
+        - "关闭 Debug 模式（Flask: DEBUG=False, Django: DEBUG=False）"
+      examples:
+        bad: "{'error': 'OperationalError: no such table: users at /app/db.py:42'}"
+        good: "{'code': 500, 'message': '服务器内部错误，请稍后重试'}"
+
+    - rule: "移除不必要的响应头"
+      level: preferred
+      rules:
+        - "移除 Server 头中的版本信息"
+        - "移除 X-Powered-By 头"
+
+# ─────────────────────────────────────────────
+# 速率限制与防滥用
+# ─────────────────────────────────────────────
+rate_limiting:
+  rules:
+    - rule: "关键接口实施速率限制"
+      level: preferred
+      targets:
+        - "登录接口：每 IP 每分钟不超过 10 次"
+        - "注册接口：每 IP 每小时不超过 5 次"
+        - "短信/邮件发送：每用户每分钟不超过 1 次"
+        - "API 全局：每用户每分钟不超过 60 次"
+      note: "返回 429 Too Many Requests 状态码"
+
+    - rule: "防止大规模数据抓取"
+      level: preferred
+      rules:
+        - "列表接口必须分页，单页最大条数限制（如 100）"
+        - "敏感数据接口增加验证码或人机验证"

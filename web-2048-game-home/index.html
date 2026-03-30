@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="heading">
+      <h1 class="title">2048</h1>
+      <div class="scores-container">
+        <div class="score-container">
+          <span class="score-label">分数</span>
+          <span class="score-value">0</span>
+        </div>
+        <div class="best-container">
+          <span class="score-label">最高分</span>
+          <span class="best-value">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="above-game">
+      <p class="game-intro">合并相同数字，达到 <strong>2048</strong>！</p>
+      <button class="new-game-button">新游戏</button>
+    </div>
+
+    <div class="game-container">
+      <div class="grid-container">
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+      </div>
+
+      <div class="tile-container"></div>
+
+      <div class="game-message">
+        <p></p>
+        <div class="actions">
+          <button class="keep-playing-button">继续游戏</button>
+          <button class="retry-button">重新开始</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS modules in dependency order -->
+  <script src="js/tile.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/storage-manager.js"></script>
+  <script src="js/ui-renderer.js"></script>
+  <script src="js/input-handler.js"></script>
+  <script src="js/game-manager.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
